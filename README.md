@@ -1,26 +1,40 @@
-# Lolin NodeMCU V3 (ESP8266) - Blink en CLion
+# Lolin NodeMCU V3 (ESP8266) - Conexión Wi-Fi & Diagnóstico en CLion
 
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-Core_6-orange?logo=platformio)](https://platformio.org/)
 [![ESP8266](https://img.shields.io/badge/Board-NodeMCU_V3_(ESP8266)-blue?logo=espressif)](https://www.espressif.com/)
 [![Framework](https://img.shields.io/badge/Framework-Arduino-00979D?logo=arduino)](https://www.arduino.cc/)
 [![IDE](https://img.shields.io/badge/IDE-CLion-000000?logo=clion)](https://www.jetbrains.com/clion/)
 
-Proyecto base de prueba de concepto (**PoC**) para programar y flashear el módulo **Lolin NodeMCU V3** (ESP8266) utilizando **CLion** y **PlatformIO**. Incluye un ejemplo funcional para hacer parpadear el LED integrado en la placa y emitir registros de diagnóstico por el puerto serie.
+Proyecto de prueba de concepto (**PoC**) para conectar el módulo **Lolin NodeMCU V3** (ESP8266) a una red Wi-Fi utilizando **CLion** y **PlatformIO**. 
+
+Incluye:
+* Conexión a red Wi-Fi (modo estación 2.4 GHz).
+* Indicación visual mediante el **LED integrado** usando patrones de parpadeo no bloqueantes.
+* Diagnóstico completo del chip y de la red por el **puerto serie** (115200 baudios).
+* Detección y reconexión automática en caso de pérdida de señal.
 
 ---
 
-## Características de la Placa
+## Características de la Placa y LED Integrado
 
 * **Microcontrolador**: ESP8266 (módulo ESP-12E / ESP-12F).
 * **Frecuencia de reloj**: 80 MHz (hasta 160 MHz).
 * **Memoria Flash**: 4 MB.
 * **Chip conversor USB a Serie**: Generalmente **WCH CH340G**.
-* **LED Integrado**: Conectado a **GPIO2** (`D4` en la serigrafía NodeMCU, definido como `LED_BUILTIN`).
+* **LED Integrado**: Conectado a **GPIO2** (`D4` en la serigrafía NodeMCU, definido como `LED_BUILTIN`). Es monocromático (azul).
 
 > [!NOTE]
 > En la mayoría de las placas NodeMCU/ESP8266, el LED integrado opera con **lógica invertida (activa en bajo)**:
 > * `digitalWrite(LED_BUILTIN, LOW)`: **Enciende** el LED.
 > * `digitalWrite(LED_BUILTIN, HIGH)`: **Apaga** el LED.
+
+### Patrones de Estado del LED
+Como el LED físico es de un solo color, se utilizan cadencias temporales diferenciadas para representar el estado:
+
+| Estado Wi-Fi | Patrón del LED | Frecuencia |
+| :--- | :--- | :--- |
+| **Conectando / Reconectando** | Parpadeo rápido | 100 ms ON / 100 ms OFF |
+| **Conectado (OK)** | Latido suave (heartbeat) | 100 ms ON / 900 ms OFF |
 
 ---
 
@@ -28,7 +42,8 @@ Proyecto base de prueba de concepto (**PoC**) para programar y flashear el módu
 
 ### Hardware
 * Placa de desarrollo **Lolin NodeMCU V3**.
-* Cable **Micro-USB** con soporte de transferencia de datos (evitar cables exclusivos de carga).
+* Red Wi-Fi de **2.4 GHz** (ESP8266 no es compatible con redes de 5 GHz).
+* Cable **Micro-USB** con soporte de transferencia de datos.
 
 ### Software
 * **CLion** (JetBrains).
@@ -37,7 +52,22 @@ Proyecto base de prueba de concepto (**PoC**) para programar y flashear el módu
   # En macOS con Homebrew:
   brew install platformio
   ```
-* **Driver USB CH340**: En versiones modernas de macOS suele estar integrado de forma nativa. Si tu sistema no reconoce el dispositivo al conectarlo, instala el driver CH34x del fabricante WCH.
+* **Driver USB CH340**: En macOS suele estar integrado. Si no detecta el puerto, instala el driver CH34x de WCH.
+
+---
+
+## Configuración de Credenciales Wi-Fi
+
+1. Copia la plantilla de credenciales si aún no existe `include/credentials.h`:
+   ```bash
+   cp include/credentials.h.example include/credentials.h
+   ```
+2. Edita `include/credentials.h` con el nombre y contraseña de tu red Wi-Fi:
+   ```cpp
+   #define WIFI_SSID "Tu_Red_WiFi_2.4GHz"
+   #define WIFI_PASSWORD "Tu_Password_Seguro"
+   ```
+*(Este archivo está ignorado en `.gitignore` para no exponer tus credenciales en el repositorio).*
 
 ---
 
@@ -45,13 +75,15 @@ Proyecto base de prueba de concepto (**PoC**) para programar y flashear el módu
 
 ```text
 poc-lolin-example/
-├── CMakeLists.txt        # Configuración CMake con targets de PlatformIO para CLion
-├── platformio.ini        # Definición del entorno y placa (nodemcuv2, espressif8266)
+├── CMakeLists.txt              # Configuración CMake para CLion
+├── platformio.ini              # Configuración del entorno nodemcuv2
+├── include/
+│   ├── credentials.h.example   # Plantilla de configuración Wi-Fi
+│   └── credentials.h           # Credenciales locales (ignorado por git)
 ├── src/
-│   └── main.cpp          # Código fuente con lógica de parpadeo y monitor serie
-├── include/              # Cabeceras personalizadas del proyecto
-├── lib/                  # Librerías locales específicas
-└── test/                 # Pruebas unitarias
+│   └── main.cpp                # Conexión Wi-Fi, gestión de LED y consola
+├── lib/                        # Librerías locales específicas
+└── test/                       # Pruebas unitarias
 ```
 
 ---
