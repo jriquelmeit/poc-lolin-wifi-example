@@ -74,7 +74,7 @@ Como el LED físico es de un solo color, se utilizan cadencias temporales difere
 ## Estructura del Proyecto
 
 ```text
-poc-lolin-example/
+poc-lolin-wifi-example/
 ├── CMakeLists.txt              # Configuración CMake para CLion
 ├── platformio.ini              # Configuración del entorno nodemcuv2
 ├── include/
@@ -92,8 +92,8 @@ poc-lolin-example/
 
 ### 1. Clonar el Repositorio
 ```bash
-git clone https://github.com/jriquelmeit/poc-lolin-example.git
-cd poc-lolin-example
+git clone https://github.com/jriquelmeit/poc-lolin-wifi-example.git
+cd poc-lolin-wifi-example
 ```
 
 ### 2. Abrir en CLion
